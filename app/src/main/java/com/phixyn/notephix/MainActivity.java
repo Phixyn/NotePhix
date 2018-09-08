@@ -6,6 +6,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,13 +15,13 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
 
     private EditText taskTextField;
     private Button addTaskButton;
-    private ListView taskList;
+    private ListView tasksListView;
 
-    private ArrayList<String> tasksArray;
+    private ArrayList<String> tasksList;
     private ArrayAdapter<String> tasksAdapter;
 
     @Override
@@ -41,9 +42,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         taskTextField = findViewById(R.id.item_edit_text);
         addTaskButton = findViewById(R.id.add_btn);
-        taskList = findViewById(R.id.items_list);
+        tasksListView = findViewById(R.id.items_list);
+
+        // Read tasks from file and show them in the ListView
+        tasksList = FileHelper.readData(this);
+        tasksAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, tasksList);
+        tasksListView.setAdapter(tasksAdapter);
 
         addTaskButton.setOnClickListener(this);
+        tasksListView.setOnItemClickListener(this);
     }
 
     @Override
@@ -75,9 +82,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String taskEntered = taskTextField.getText().toString();
                 tasksAdapter.add(taskEntered);
                 taskTextField.setText("");
+                // Write task to file
+                FileHelper.writeData(tasksList, this);
 
                 Toast.makeText(this, "Task added", Toast.LENGTH_SHORT).show();
                 break;
         }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+        tasksList.remove(position);
+        tasksAdapter.notifyDataSetChanged();
+        Toast.makeText(this, "Task deleted", Toast.LENGTH_SHORT).show();
     }
 }
