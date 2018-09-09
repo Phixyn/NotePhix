@@ -86,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
+        // Make sure the EditText does not receive focus when activity is resumed
+        mNewTaskEditText.clearFocus();
         /* Note: If the data set is large, it is worth looking into the finer control
          * methods available in RecyclerAdapter, which allow notifying if individual
          * items have been added, removed, or changed.
