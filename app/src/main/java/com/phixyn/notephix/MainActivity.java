@@ -1,5 +1,6 @@
 package com.phixyn.notephix;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -40,12 +42,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         */
 
-        // Get references to EditText and Add button
+        // Set up EditText for typing a new task
         mNewTaskEditText = findViewById(R.id.item_edit_text);
+        mNewTaskEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                // Hide soft keyboard if EditText loses focus
+                if (!hasFocus) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(
+                            Context.INPUT_METHOD_SERVICE
+                    );
+                    if (imm != null)
+                        imm.hideSoftInputFromWindow(
+                                mNewTaskEditText.getWindowToken(),
+                                0);
+                }
+            }
+        });
+
+        // Set up "Add task" button
         final Button addTaskButton = findViewById(R.id.add_btn);
         addTaskButton.setOnClickListener(this);
 
-        // Set up RecyclerView
+        // Set up RecyclerView for the list of tasks
         final RecyclerView tasksListView = findViewById(R.id.items_list);
         // "RecyclerView"s need a LayoutManager to manage how items within
         // it are displayed.
@@ -98,9 +117,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
+        // TODO just do this in inner class instead
         switch (view.getId()) {
             case R.id.add_btn:
-                String taskEntered = mNewTaskEditText.getText().toString();
+                final String taskEntered = mNewTaskEditText.getText().toString();
                 // TODO: Not sure if this is the best way to do things
                 // Should we add via the adapter directly, like we did previously
                 // with the ArrayAdapter? Or is this fine?
@@ -111,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 FileHelper.writeData(mTasksArrayList, this);
 
                 mNewTaskEditText.setText("");
+                mNewTaskEditText.clearFocus();
                 Toast.makeText(this, "Task added", Toast.LENGTH_SHORT).show();
                 break;
         }
