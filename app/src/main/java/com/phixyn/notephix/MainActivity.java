@@ -6,12 +6,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
 
@@ -42,8 +45,12 @@ public class MainActivity extends AppCompatActivity {
         });
         */
 
-        // Set up EditText for typing a new task
+        // Get references of the EditText and Add button
         mNewTaskEditText = findViewById(R.id.item_edit_text);
+        final Button addTaskButton = findViewById(R.id.add_btn);
+
+        // Set up EditText for typing a new task
+        // Set up an event listener for when the focus on EditText changes
         mNewTaskEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
@@ -59,9 +66,22 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        // Set up an event listener for editor actions
+        mNewTaskEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    // When IME_ACTION_DONE event is triggered, send a
+                    // click event to the add task button.
+                    addTaskButton.performClick();
+                    // Return true because we have consumed the action
+                    return true;
+                }
+                return false;
+            }
+        });
 
         // Set up "Add task" button
-        final Button addTaskButton = findViewById(R.id.add_btn);
         // Register an event listener for onClick to the Button
         addTaskButton.setOnClickListener(new View.OnClickListener() {
             @Override
