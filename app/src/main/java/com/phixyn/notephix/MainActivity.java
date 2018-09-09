@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -94,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         tasksList.remove(position);
         tasksAdapter.notifyDataSetChanged();
+        FileHelper.writeData(tasksList, this);
         Toast.makeText(this, "Task deleted", Toast.LENGTH_SHORT).show();
     }
 }
