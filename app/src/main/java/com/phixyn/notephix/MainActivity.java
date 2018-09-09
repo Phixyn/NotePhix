@@ -33,18 +33,6 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        /*
-        // Set up FloatingActionButton
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        */
-
         // Get references of the EditText and Add button
         mNewTaskEditText = findViewById(R.id.item_edit_text);
         final Button addTaskButton = findViewById(R.id.add_btn);
@@ -69,7 +57,11 @@ public class MainActivity extends AppCompatActivity {
         // Set up an event listener for editor actions
         mNewTaskEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+            public boolean onEditorAction(
+                    TextView textView,
+                    int actionId,
+                    KeyEvent keyEvent)
+            {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     // When IME_ACTION_DONE event is triggered, send a
                     // click event to the add task button.
@@ -93,7 +85,12 @@ public class MainActivity extends AppCompatActivity {
                     // Should we add via the adapter directly, like we did previously
                     // with the ArrayAdapter? Or is this fine?
                     // tasksAdapter.add(taskEntered);
-                    mTasksArrayList.add(taskEntered);
+
+                    /* Add new task to the beginning of the ArrayList
+                     * Unlike mTasksArrayList.add(taskEntered); this will ensure that
+                     * new tasks appeart at the top of the RecyclerView, rather than being
+                     * added at the bottom. */
+                    mTasksArrayList.add(0, taskEntered);
                     mTasksRecyclerAdapter.notifyDataSetChanged();
                     // Write task to file
                     FileHelper.writeData(mTasksArrayList, MainActivity.this);
@@ -118,8 +115,7 @@ public class MainActivity extends AppCompatActivity {
         tasksListView.setLayoutManager(tasksLayoutManager);
         /* Other LayoutManager implementations we could use include:
          *   GridLayoutManager
-         *   StaggeredGridLayoutManager
-         */
+         *   StaggeredGridLayoutManager */
 
         // Read tasks from the file and pass them to our Recycler Adapter
         mTasksArrayList = FileHelper.readData(this);
@@ -135,8 +131,7 @@ public class MainActivity extends AppCompatActivity {
         mNewTaskEditText.clearFocus();
         /* Note: If the data set is large, it is worth looking into the finer control
          * methods available in RecyclerAdapter, which allow notifying if individual
-         * items have been added, removed, or changed.
-         */
+         * items have been added, removed, or changed. */
         mTasksRecyclerAdapter.notifyDataSetChanged();
     }
 
@@ -149,9 +144,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        /* Handle action bar item clicks here. The action bar will
+         * automatically handle clicks on the Home/Up button, so long
+         * as you specify a parent activity in AndroidManifest.xml. */
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
