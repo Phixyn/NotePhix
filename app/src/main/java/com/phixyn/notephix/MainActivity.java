@@ -15,7 +15,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
     private EditText mNewTaskEditText;
     private ArrayList<String> mTasksArrayList;
@@ -62,7 +62,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Set up "Add task" button
         final Button addTaskButton = findViewById(R.id.add_btn);
-        addTaskButton.setOnClickListener(this);
+        // Register an event listener for onClick to the Button
+        addTaskButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final String taskEntered = mNewTaskEditText.getText().toString();
+                // Ensure that the string entered is not empty or all spaces
+                if (!taskEntered.isEmpty() && !taskEntered.trim().isEmpty()) {
+                    // TODO: Not sure if this is the best way to do things
+                    // Should we add via the adapter directly, like we did previously
+                    // with the ArrayAdapter? Or is this fine?
+                    // tasksAdapter.add(taskEntered);
+                    mTasksArrayList.add(taskEntered);
+                    mTasksRecyclerAdapter.notifyDataSetChanged();
+                    // Write task to file
+                    FileHelper.writeData(mTasksArrayList, MainActivity.this);
+
+                    mNewTaskEditText.setText("");
+                    mNewTaskEditText.clearFocus();
+                    Toast.makeText(
+                            MainActivity.this,
+                            "Task added",
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            }
+        });
 
         // Set up RecyclerView for the list of tasks
         final RecyclerView tasksListView = findViewById(R.id.items_list);
@@ -115,27 +140,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onClick(View view) {
-        // TODO just do this in inner class instead
-        switch (view.getId()) {
-            case R.id.add_btn:
-                final String taskEntered = mNewTaskEditText.getText().toString();
-                // TODO: Not sure if this is the best way to do things
-                // Should we add via the adapter directly, like we did previously
-                // with the ArrayAdapter? Or is this fine?
-                // tasksAdapter.add(taskEntered);
-                mTasksArrayList.add(taskEntered);
-                mTasksRecyclerAdapter.notifyDataSetChanged();
-                // Write task to file
-                FileHelper.writeData(mTasksArrayList, this);
-
-                mNewTaskEditText.setText("");
-                mNewTaskEditText.clearFocus();
-                Toast.makeText(this, "Task added", Toast.LENGTH_SHORT).show();
-                break;
-        }
     }
 }
