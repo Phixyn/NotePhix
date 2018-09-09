@@ -71,6 +71,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        // Note: If the data set is large, it is worth looking into the finer control methods
+        // available in RecyclerAdapter, which allow notifying if individual items have been added,
+        // removed, or changed.
+        tasksRecyclerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
