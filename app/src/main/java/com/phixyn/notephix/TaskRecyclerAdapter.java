@@ -74,9 +74,9 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
     }
 
     /**
-     * ViewHolder for our RecyclerView.
+     * ViewHolder class for our RecyclerView.
      * Receives a View.
-     * Get references to the (Text) Views inside of it.
+     * Contains references to the (Text) Views inside of it.
      */
     public class ViewHolder extends RecyclerView.ViewHolder {
 

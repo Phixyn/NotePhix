@@ -2,6 +2,8 @@ package com.phixyn.notephix;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,14 +17,18 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText taskTextField;
     private Button addTaskButton;
-    private ListView tasksListView;
+    // private ListView tasksListView;
+
+    private RecyclerView tasksListView;
 
     private ArrayList<String> tasksList;
-    private ArrayAdapter<String> tasksAdapter;
+    // private ArrayAdapter<String> tasksAdapter;
+    private TaskRecyclerAdapter tasksRecyclerAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +51,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         addTaskButton = findViewById(R.id.add_btn);
         tasksListView = findViewById(R.id.items_list);
 
+        // RecyclerViews need a LayoutManager to manage how items within it are displayed
+        final LinearLayoutManager tasksLayoutManager = new LinearLayoutManager(this);
+        tasksListView.setLayoutManager(tasksLayoutManager);
+        // Other LayoutManager implementations include:
+        // * GridLayoutManager
+        // * StaggeredGridLayoutManager
+
         // Read tasks from file and show them in the ListView
         tasksList = FileHelper.readData(this);
-        tasksAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, tasksList);
-        tasksListView.setAdapter(tasksAdapter);
+        // final TaskRecyclerAdapter taskRecyclerAdapter = new TaskRecyclerAdapter(this, tasksList);
+
+        // tasksAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, tasksList);
+        tasksRecyclerAdapter = new TaskRecyclerAdapter(this, tasksList);
+        tasksListView.setAdapter(tasksRecyclerAdapter);
 
         addTaskButton.setOnClickListener(this);
-        tasksListView.setOnItemClickListener(this);
+        // tasksListView.setOnItemClickListener(this);
     }
 
     @Override
@@ -81,21 +97,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()) {
             case R.id.add_btn:
                 String taskEntered = taskTextField.getText().toString();
-                tasksAdapter.add(taskEntered);
-                taskTextField.setText("");
+                // TODO: Not sure if this is the best way to do things
+                // Should we add via the adapter directly, like we did with the ArrayAdapter?
+                // Or is this fine?
+                // tasksAdapter.add(taskEntered);
+                tasksList.add(taskEntered);
+                tasksRecyclerAdapter.notifyDataSetChanged();
                 // Write task to file
                 FileHelper.writeData(tasksList, this);
 
+                taskTextField.setText("");
                 Toast.makeText(this, "Task added", Toast.LENGTH_SHORT).show();
                 break;
         }
     }
 
+    /*
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         tasksList.remove(position);
-        tasksAdapter.notifyDataSetChanged();
+        tasksRecyclerAdapter.notifyDataSetChanged();
+        // Write updated data set to file
         FileHelper.writeData(tasksList, this);
+
         Toast.makeText(this, "Task deleted", Toast.LENGTH_SHORT).show();
-    }
+    }*/
 }
