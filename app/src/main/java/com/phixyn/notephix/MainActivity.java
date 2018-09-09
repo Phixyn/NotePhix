@@ -1,19 +1,24 @@
 package com.phixyn.notephix;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
     private EditText mNewTaskEditText;
     private ArrayList<String> mTasksArrayList;
@@ -28,24 +33,80 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        /*
-        // Set up FloatingActionButton
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        */
-
-        // Get references to EditText and Add button
+        // Get references of the EditText and Add button
         mNewTaskEditText = findViewById(R.id.item_edit_text);
         final Button addTaskButton = findViewById(R.id.add_btn);
-        addTaskButton.setOnClickListener(this);
 
-        // Set up RecyclerView
+        // Set up EditText for typing a new task
+        // Set up an event listener for when the focus on EditText changes
+        mNewTaskEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                // Hide soft keyboard if EditText loses focus
+                if (!hasFocus) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(
+                            Context.INPUT_METHOD_SERVICE
+                    );
+                    if (imm != null)
+                        imm.hideSoftInputFromWindow(
+                                mNewTaskEditText.getWindowToken(),
+                                0);
+                }
+            }
+        });
+        // Set up an event listener for editor actions
+        mNewTaskEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(
+                    TextView textView,
+                    int actionId,
+                    KeyEvent keyEvent)
+            {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    // When IME_ACTION_DONE event is triggered, send a
+                    // click event to the add task button.
+                    addTaskButton.performClick();
+                    // Return true because we have consumed the action
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        // Set up "Add task" button
+        // Register an event listener for onClick to the Button
+        addTaskButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final String taskEntered = mNewTaskEditText.getText().toString();
+                // Ensure that the string entered is not empty or all spaces
+                if (!taskEntered.isEmpty() && !taskEntered.trim().isEmpty()) {
+                    // TODO: Not sure if this is the best way to do things
+                    // Should we add via the adapter directly, like we did previously
+                    // with the ArrayAdapter? Or is this fine?
+                    // tasksAdapter.add(taskEntered);
+
+                    /* Add new task to the beginning of the ArrayList
+                     * Unlike mTasksArrayList.add(taskEntered); this will ensure that
+                     * new tasks appeart at the top of the RecyclerView, rather than being
+                     * added at the bottom. */
+                    mTasksArrayList.add(0, taskEntered);
+                    mTasksRecyclerAdapter.notifyDataSetChanged();
+                    // Write task to file
+                    FileHelper.writeData(mTasksArrayList, MainActivity.this);
+
+                    mNewTaskEditText.setText("");
+                    mNewTaskEditText.clearFocus();
+                    Toast.makeText(
+                            MainActivity.this,
+                            "Task added",
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            }
+        });
+
+        // Set up RecyclerView for the list of tasks
         final RecyclerView tasksListView = findViewById(R.id.items_list);
         // "RecyclerView"s need a LayoutManager to manage how items within
         // it are displayed.
@@ -54,8 +115,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tasksListView.setLayoutManager(tasksLayoutManager);
         /* Other LayoutManager implementations we could use include:
          *   GridLayoutManager
-         *   StaggeredGridLayoutManager
-         */
+         *   StaggeredGridLayoutManager */
 
         // Read tasks from the file and pass them to our Recycler Adapter
         mTasksArrayList = FileHelper.readData(this);
@@ -67,10 +127,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
+        // Make sure the EditText does not receive focus when activity is resumed
+        mNewTaskEditText.clearFocus();
         /* Note: If the data set is large, it is worth looking into the finer control
          * methods available in RecyclerAdapter, which allow notifying if individual
-         * items have been added, removed, or changed.
-         */
+         * items have been added, removed, or changed. */
         mTasksRecyclerAdapter.notifyDataSetChanged();
     }
 
@@ -83,9 +144,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        /* Handle action bar item clicks here. The action bar will
+         * automatically handle clicks on the Home/Up button, so long
+         * as you specify a parent activity in AndroidManifest.xml. */
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -94,25 +155,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.add_btn:
-                String taskEntered = mNewTaskEditText.getText().toString();
-                // TODO: Not sure if this is the best way to do things
-                // Should we add via the adapter directly, like we did previously
-                // with the ArrayAdapter? Or is this fine?
-                // tasksAdapter.add(taskEntered);
-                mTasksArrayList.add(taskEntered);
-                mTasksRecyclerAdapter.notifyDataSetChanged();
-                // Write task to file
-                FileHelper.writeData(mTasksArrayList, this);
-
-                mNewTaskEditText.setText("");
-                Toast.makeText(this, "Task added", Toast.LENGTH_SHORT).show();
-                break;
-        }
     }
 }

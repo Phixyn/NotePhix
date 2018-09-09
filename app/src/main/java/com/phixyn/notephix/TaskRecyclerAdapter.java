@@ -41,10 +41,10 @@ public class TaskRecyclerAdapter
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Create (inflate) the task item view
-        // Pass the layout resource we want to inflate
-        //  (in this case, the item_task_list with the FrameLayout containing CardView)
-        // false = don't automatically attach inflated view to its parent
-        //  (we do this through the adapter)
+        /* Pass the layout resource we want to inflate
+         *  (in this case, the item_task_list with the FrameLayout containing CardView)
+         * false = don't automatically attach inflated view to its parent
+         *  (we do this through the adapter) */
         View itemView = mLayoutInflater.inflate(
                 R.layout.item_task_list,
                 parent,

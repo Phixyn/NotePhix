@@ -32,7 +32,8 @@
             android:layout_weight="4"
             android:paddingStart="8dp"
             android:paddingEnd="6dp"
-            android:inputType="text"
+            android:inputType="textCapSentences|textAutoCorrect"
+            android:imeOptions="actionDone"
             android:hint="New task"/>
 
         <Button
