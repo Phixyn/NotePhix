@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 
 public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapter.ViewHolder> {
@@ -31,6 +30,7 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
      * pool that the RecyclerView uses.
      *
      * Takes care of inflating the view and storing information about the view in our ViewHolder.
+     * In other words, inflates the View and associates it with a ViewHolder.
      *
      * @return A new instance of our ViewHolder (inner) class, passing in a View.
      *         The RecyclerView will use this to start creating the pool of views.
