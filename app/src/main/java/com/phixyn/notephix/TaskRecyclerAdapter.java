@@ -10,13 +10,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
 
-public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapter.ViewHolder> {
+public class TaskRecyclerAdapter
+        extends RecyclerView.Adapter<TaskRecyclerAdapter.ViewHolder> {
 
     private final Context mContext;
     private final LayoutInflater mLayoutInflater;
     private final ArrayList<String> mTasks;
 
-    public TaskRecyclerAdapter(Context context, ArrayList<String> tasks) {
+    TaskRecyclerAdapter(Context context, ArrayList<String> tasks) {
         mContext = context;
         // LayoutInflater is used to create views from a layout resource
         // It "inflates" layout resources into view hierarchies
@@ -29,7 +30,8 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
      * an instance of the inflated view. Returns the ViewHolder so it can go to the
      * pool that the RecyclerView uses.
      *
-     * Takes care of inflating the view and storing information about the view in our ViewHolder.
+     * Takes care of inflating the view and storing information about the view in
+     * our ViewHolder.
      * In other words, inflates the View and associates it with a ViewHolder.
      *
      * @return A new instance of our ViewHolder (inner) class, passing in a View.
@@ -43,7 +45,11 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
         //  (in this case, the item_task_list with the FrameLayout containing CardView)
         // false = don't automatically attach inflated view to its parent
         //  (we do this through the adapter)
-        View itemView = mLayoutInflater.inflate(R.layout.item_task_list, parent, false);
+        View itemView = mLayoutInflater.inflate(
+                R.layout.item_task_list,
+                parent,
+                false
+        );
         // Return the task item view (CardView inside the FrameLayout)
         return new ViewHolder(itemView);
     }
@@ -58,8 +64,9 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
      */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        // Get the data from our ArrayList and display it in the view holder's TextView
+        // Get the data from our ArrayList...
         String task = mTasks.get(position);
+        // ...and display it in the view holder's TextView.
         holder.mTaskTextView.setText(task);
     }
 
@@ -78,11 +85,11 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
      * Receives a View.
      * Contains references to the (Text) Views inside of it.
      */
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
-        public final TextView mTaskTextView;
+        final TextView mTaskTextView;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             mTaskTextView = itemView.findViewById(R.id.view_task_card_text);
 
@@ -90,8 +97,8 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
             itemView.setOnClickListener(new View.OnClickListener() {
                 /**
                  * Deletes a task when its CardView is tapped on.
-                 * Removes the corresponding task from the ArrayList an writes the updated
-                 * task list to the file.
+                 * Removes the corresponding task from the ArrayList
+                 * and writes the updated task list to the file.
                  *
                  * @param view The instance of the CardView that was tapped on.
                  */
@@ -102,10 +109,13 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
                     // Write updated data set to file
                     FileHelper.writeData(mTasks, mContext);
 
-                    Toast.makeText(mContext, "Task deleted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(
+                            mContext,
+                            "Task deleted",
+                            Toast.LENGTH_SHORT
+                    ).show();
                 }
             });
         }
-
     }
 }
