@@ -8,11 +8,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -21,14 +18,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private EditText taskTextField;
     private Button addTaskButton;
-    // private ListView tasksListView;
-
     private RecyclerView tasksListView;
-
     private ArrayList<String> tasksList;
-    // private ArrayAdapter<String> tasksAdapter;
     private TaskRecyclerAdapter tasksRecyclerAdapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,14 +52,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Read tasks from file and show them in the ListView
         tasksList = FileHelper.readData(this);
-        // final TaskRecyclerAdapter taskRecyclerAdapter = new TaskRecyclerAdapter(this, tasksList);
-
-        // tasksAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, tasksList);
         tasksRecyclerAdapter = new TaskRecyclerAdapter(this, tasksList);
         tasksListView.setAdapter(tasksRecyclerAdapter);
 
         addTaskButton.setOnClickListener(this);
-        // tasksListView.setOnItemClickListener(this);
     }
 
     @Override
@@ -120,15 +108,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
-
-    /*
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        tasksList.remove(position);
-        tasksRecyclerAdapter.notifyDataSetChanged();
-        // Write updated data set to file
-        FileHelper.writeData(tasksList, this);
-
-        Toast.makeText(this, "Task deleted", Toast.LENGTH_SHORT).show();
-    }*/
 }
