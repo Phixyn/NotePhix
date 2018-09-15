@@ -86,7 +86,6 @@ public class TaskRecyclerAdapter
      * Contains references to the (Text) Views inside of it.
      */
     class ViewHolder extends RecyclerView.ViewHolder {
-
         final TextView mTaskTextView;
 
         ViewHolder(View itemView) {
