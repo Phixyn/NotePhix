@@ -10,12 +10,12 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 public class FileHelper {
-
     private static final String FILENAME = "notephix_tasks.md";
 
     public static void writeData(ArrayList<String> tasks, Context context) {
         try {
-            FileOutputStream fos = context.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            FileOutputStream fos = context.openFileOutput(
+                    FILENAME, Context.MODE_PRIVATE);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(tasks);
             oos.close();
