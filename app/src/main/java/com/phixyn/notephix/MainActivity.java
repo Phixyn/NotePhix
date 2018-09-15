@@ -19,7 +19,6 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
     private EditText mNewTaskEditText;
     private ArrayList<String> mTasksArrayList;
     private TaskRecyclerAdapter mTasksRecyclerAdapter;
@@ -55,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         // Set up an event listener for editor actions
-        mNewTaskEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mNewTaskEditText.setOnEditorActionListener(
+                new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(
                     TextView textView,
@@ -88,8 +88,8 @@ public class MainActivity extends AppCompatActivity {
 
                     /* Add new task to the beginning of the ArrayList
                      * Unlike mTasksArrayList.add(taskEntered); this will ensure that
-                     * new tasks appeart at the top of the RecyclerView, rather than being
-                     * added at the bottom. */
+                     * new tasks appear at the top of the RecyclerView, rather than
+                     * being added at the bottom. */
                     mTasksArrayList.add(0, taskEntered);
                     mTasksRecyclerAdapter.notifyDataSetChanged();
                     // Write task to file
