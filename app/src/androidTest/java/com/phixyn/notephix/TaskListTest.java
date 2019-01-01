@@ -15,7 +15,6 @@ import com.schibsted.spain.barista.rule.cleardata.ClearFilesRule;
 import static com.schibsted.spain.barista.assertion.BaristaFocusedAssertions.assertFocused;
 import static com.schibsted.spain.barista.assertion.BaristaFocusedAssertions.assertNotFocused;
 import static com.schibsted.spain.barista.assertion.BaristaHintAssertions.assertHint;
-import static com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertContains;
 import static com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertDisplayed;
 import static com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed;
 import static com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn;
@@ -52,6 +51,8 @@ public class TaskListTest {
     private String mTestDataLongTask = "This is a really long string that will most likely create a TextView that spans more than one line. This is used to test multi-line text.";
     private String mTestDataUnicodeCharacters = "Buy a partyhat \uD83C\uDF89\uD83C\uDF88\uD83C\uDF89"; // TODO
     private String mTestDataMultipleLines = "This is something that is\nguaranteed to end up in\nmultiple lines.";
+    private String mTestDataEmptyTask = "";
+    private String mTestDataEmptyTaskWithSpaces = "           ";
     //endregion
 
     @Rule
@@ -64,6 +65,7 @@ public class TaskListTest {
             MainActivity.class);
     */
 
+    // TODO: Uncomment to test with a fresh app (no existing data)
     // Clear all app's SharedPreferences
     // @Rule public ClearPreferencesRule clearPreferencesRule = new ClearPreferencesRule();
     // Delete all tables from all the app's SQLite Databases
@@ -82,12 +84,6 @@ public class TaskListTest {
     }
 
     @Test
-    public void newlineEscapeCharacter_isIgnored() {
-        writeTo(R.id.item_edit_text, mTestDataLongTask);
-        clickOn(R.id.add_btn);
-    }
-
-    @Test
     public void allElementsVisible() {
         assertDisplayed(R.id.items_list);
         assertDisplayed(R.id.item_edit_text);
@@ -96,8 +92,9 @@ public class TaskListTest {
 
     @Test
     public void enterText_forNewTask() {
+        clickOn(R.id.item_edit_text);
         writeTo(R.id.item_edit_text, mTestDataSingleTask);
-        assertContains(R.id.item_edit_text, mTestDataSingleTask);
+        assertDisplayed(R.id.item_edit_text, mTestDataSingleTask);
     }
 
     @Test
@@ -107,8 +104,7 @@ public class TaskListTest {
 
     @Test
     public void addButtonText_isCorrect() {
-        // TODO: see if we can use string resource
-        assertContains(R.id.add_btn, "Add");
+        assertDisplayed(R.id.add_btn, R.string.button_add_task);
     }
 
     @Test
@@ -118,19 +114,46 @@ public class TaskListTest {
         writeTo(R.id.item_edit_text, mTestDataSingleTask);
         clickOn(R.id.add_btn);
         assertNotFocused(R.id.item_edit_text);
-        assertContains(R.id.view_task_card_text, mTestDataSingleTask);
+        assertDisplayed(R.id.view_task_card_text, mTestDataSingleTask);
     }
 
     @Test
-    public void addManyNewTasks_PogChamp() {
+    public void addNewTask_withLongString() {
+        clickOn(R.id.item_edit_text);
+        writeTo(R.id.item_edit_text, mTestDataLongTask);
+        clickOn(R.id.add_btn);
+        assertDisplayed(R.id.view_task_card_text, mTestDataLongTask);
+    }
+
+    @Test
+    public void addNewTask_withMultipleLines() {
+        clickOn(R.id.item_edit_text);
+        writeTo(R.id.item_edit_text, mTestDataMultipleLines);
+        clickOn(R.id.add_btn);
+        assertDisplayed(R.id.view_task_card_text, mTestDataMultipleLines);
+    }
+
+    @Test
+    public void addNewTask_withUnicodeCharacters() {
+        clickOn(R.id.item_edit_text);
+        writeTo(R.id.item_edit_text, mTestDataUnicodeCharacters);
+        clickOn(R.id.add_btn);
+        assertDisplayed(R.id.view_task_card_text, mTestDataUnicodeCharacters);
+    }
+
+    @Test
+    public void addManyNewTasks() {
         for (String task : mTestDataLargeCollection) {
+            clickOn(R.id.item_edit_text);
             writeTo(R.id.item_edit_text, task);
             clickOn(R.id.add_btn);
+            assertDisplayed(R.id.view_task_card_text, task);
         }
     }
 
     @Test
     public void addSampleTasks() {
+        // Used to set up app screenshots for README, Play Store, etc.
         for (String task : mTestDataSampleTasks) {
             writeTo(R.id.item_edit_text, task);
             clickOn(R.id.add_btn);
@@ -139,9 +162,9 @@ public class TaskListTest {
 
     @Test
     public void removeTask() {
+        clickOn(R.id.item_edit_text);
         writeTo(R.id.item_edit_text, mTestDataSingleTask);
         clickOn(R.id.add_btn);
-        // assertContains(R.id.view_task_card_text, mTestDataSingleTask);
         assertDisplayed(R.id.view_task_card_text, mTestDataSingleTask);
         clickOn(mTestDataSingleTask);
         assertNotDisplayed(R.id.view_task_card_text, mTestDataSingleTask);
@@ -149,11 +172,21 @@ public class TaskListTest {
 
     @Test
     public void cannotAddEmptyTask() {
-
+        clickOn(R.id.item_edit_text);
+        writeTo(R.id.item_edit_text, mTestDataEmptyTask);
+        clickOn(R.id.add_btn);
+        assertNotDisplayed(R.id.view_task_card_text, mTestDataEmptyTask);
+        assertFocused(R.id.item_edit_text);
+        assertDisplayed(R.id.item_edit_text, mTestDataEmptyTask);
     }
 
     @Test
     public void cannotAddEmptyTask_withSpaceCharacters() {
-
+        clickOn(R.id.item_edit_text);
+        writeTo(R.id.item_edit_text, mTestDataEmptyTaskWithSpaces);
+        clickOn(R.id.add_btn);
+        assertNotDisplayed(R.id.view_task_card_text, mTestDataEmptyTaskWithSpaces);
+        assertFocused(R.id.item_edit_text);
+        assertDisplayed(R.id.item_edit_text, mTestDataEmptyTaskWithSpaces);
     }
 }
