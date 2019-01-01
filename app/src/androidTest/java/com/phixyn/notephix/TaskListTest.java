@@ -7,9 +7,13 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import android.content.pm.ActivityInfo;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
+
 import com.schibsted.spain.barista.rule.cleardata.ClearFilesRule;
 
 import static com.schibsted.spain.barista.assertion.BaristaFocusedAssertions.assertFocused;
@@ -19,6 +23,7 @@ import static com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.
 import static com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed;
 import static com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn;
 import static com.schibsted.spain.barista.interaction.BaristaEditTextInteractions.writeTo;
+import static com.schibsted.spain.barista.interaction.BaristaSleepInteractions.sleep;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -54,6 +59,8 @@ public class TaskListTest {
     private String mTestDataEmptyTask = "";
     private String mTestDataEmptyTaskWithSpaces = "           ";
     //endregion
+
+    private int mRotationGracePeriod = 2000; // in milliseconds
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(
@@ -188,5 +195,37 @@ public class TaskListTest {
         assertNotDisplayed(R.id.view_task_card_text, mTestDataEmptyTaskWithSpaces);
         assertFocused(R.id.item_edit_text);
         assertDisplayed(R.id.item_edit_text, mTestDataEmptyTaskWithSpaces);
+    }
+
+    @Test
+    public void activityRotation_removesEditTextFocus() {
+        MainActivity activity = mActivityRule.getActivity();
+
+        // Ensure orientation is portrait
+        if (activity.getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            // Wait for rotation to finish (Barista's sleep)
+            sleep(mRotationGracePeriod);
+        }
+
+        clickOn(R.id.item_edit_text);
+        assertFocused(R.id.item_edit_text);
+        sleep(mRotationGracePeriod);
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        sleep(mRotationGracePeriod);
+        assertNotFocused(R.id.item_edit_text);
+
+        // Ensure orientation is landscape
+        if (activity.getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            sleep(mRotationGracePeriod);
+        }
+
+        clickOn(R.id.item_edit_text);
+        assertFocused(R.id.item_edit_text);
+        sleep(mRotationGracePeriod);
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        sleep(mRotationGracePeriod);
+        assertNotFocused(R.id.item_edit_text);
     }
 }
