@@ -1,24 +1,23 @@
 package com.phixyn.notephix;
 
-import java.util.Arrays;
-import java.util.List;
+import android.content.pm.ActivityInfo;
+import android.support.test.filters.LargeTest;
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import android.content.pm.ActivityInfo;
-import android.support.test.filters.LargeTest;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
-
-import com.schibsted.spain.barista.rule.cleardata.ClearFilesRule;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.schibsted.spain.barista.assertion.BaristaFocusedAssertions.assertFocused;
 import static com.schibsted.spain.barista.assertion.BaristaFocusedAssertions.assertNotFocused;
 import static com.schibsted.spain.barista.assertion.BaristaHintAssertions.assertHint;
+import static com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertContains;
 import static com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertDisplayed;
 import static com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed;
 import static com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn;
@@ -227,5 +226,35 @@ public class TaskListTest {
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         sleep(mRotationGracePeriod);
         assertNotFocused(R.id.item_edit_text);
+    }
+
+    @Test
+    public void activityRotation_doesNotRemoveTextFromEditText() {
+        MainActivity activity = mActivityRule.getActivity();
+
+        // Ensure orientation is portrait
+        if (activity.getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            // Wait for rotation to finish (Barista's sleep)
+            sleep(mRotationGracePeriod);
+        }
+
+        clickOn(R.id.item_edit_text);
+        writeTo(R.id.item_edit_text, mTestDataSingleTask);
+        assertContains(R.id.item_edit_text, mTestDataSingleTask);
+        sleep(mRotationGracePeriod);
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        sleep(mRotationGracePeriod);
+        assertContains(R.id.item_edit_text, mTestDataSingleTask);
+
+        // Ensure orientation is landscape
+        if (activity.getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            sleep(mRotationGracePeriod);
+        }
+
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        sleep(mRotationGracePeriod);
+        assertContains(R.id.item_edit_text, mTestDataSingleTask);
     }
 }
