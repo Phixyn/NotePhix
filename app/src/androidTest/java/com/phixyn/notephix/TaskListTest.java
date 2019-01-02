@@ -232,7 +232,7 @@ public class TaskListTest {
     public void activityRotation_doesNotRemoveTextFromEditText() {
         MainActivity activity = mActivityRule.getActivity();
 
-        // Ensure orientation is portrait
+        // Set orientation to portrait if needed
         if (activity.getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             // Wait for rotation to finish (Barista's sleep)
@@ -247,7 +247,7 @@ public class TaskListTest {
         sleep(mRotationGracePeriod);
         assertContains(R.id.item_edit_text, mTestDataSingleTask);
 
-        // Ensure orientation is landscape
+        // Set orientation to landscape if needed
         if (activity.getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             sleep(mRotationGracePeriod);
@@ -256,5 +256,20 @@ public class TaskListTest {
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         sleep(mRotationGracePeriod);
         assertContains(R.id.item_edit_text, mTestDataSingleTask);
+    }
+
+    @Test
+    public void allElementsVisible_inLandscapeOrientation() {
+        MainActivity activity = mActivityRule.getActivity();
+
+        // Set orientation to landscape if needed
+        if (activity.getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            sleep(mRotationGracePeriod);
+        }
+
+        assertDisplayed(R.id.items_list);
+        assertDisplayed(R.id.item_edit_text);
+        assertDisplayed(R.id.add_btn);
     }
 }
