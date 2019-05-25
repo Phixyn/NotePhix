@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
-import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -28,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Set up Toolbar
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         // Get references of the EditText and Add button
@@ -37,20 +36,21 @@ class MainActivity : AppCompatActivity() {
 
         // Set up EditText for typing a new task
         // Set up an event listener for when the focus on EditText changes
-        mNewTaskEditText!!.onFocusChangeListener = View.OnFocusChangeListener { view, hasFocus ->
+        mNewTaskEditText!!.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             // Hide soft keyboard if EditText loses focus
             if (!hasFocus) {
                 val imm = getSystemService(
                     Context.INPUT_METHOD_SERVICE
                 ) as InputMethodManager
-                imm?.hideSoftInputFromWindow(
+                imm.hideSoftInputFromWindow(
                     mNewTaskEditText!!.windowToken,
-                    0)
+                    0
+                )
             }
         }
         // Set up an event listener for editor actions
         mNewTaskEditText!!.setOnEditorActionListener(
-            TextView.OnEditorActionListener { textView, actionId, keyEvent ->
+            TextView.OnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     // When IME_ACTION_DONE event is triggered, send a
                     // click event to the add task button.
@@ -59,23 +59,24 @@ class MainActivity : AppCompatActivity() {
                     return@OnEditorActionListener true
                 }
                 false
-            })
+            }
+        )
 
         // Set up "Add task" button
         // Register an event listener for onClick to the Button
         addTaskButton.setOnClickListener {
             val taskEntered = mNewTaskEditText!!.text.toString()
             // Ensure that the string entered is not empty or all spaces
-            if (!taskEntered.isEmpty() && !taskEntered.trim { it <= ' ' }.isEmpty()) {
+            if (taskEntered.isNotEmpty() && taskEntered.trim { it <= ' ' }.isNotEmpty()) {
                 // TODO: Not sure if this is the best way to do things
                 // Should we add via the adapter directly, like we did previously
                 // with the ArrayAdapter? Or is this fine?
                 // tasksAdapter.add(taskEntered);
 
                 /* Add new task to the beginning of the ArrayList
-                     * Unlike mTasksArrayList.add(taskEntered); this will ensure that
-                     * new tasks appear at the top of the RecyclerView, rather than
-                     * being added at the bottom. */
+                 * Unlike mTasksArrayList.add(taskEntered); this will ensure that
+                 * new tasks appear at the top of the RecyclerView, rather than
+                 * being added at the bottom. */
                 mTasksArrayList!!.add(0, taskEntered)
                 mTasksRecyclerAdapter!!.notifyDataSetChanged()
                 // Write task to file
@@ -129,7 +130,6 @@ class MainActivity : AppCompatActivity() {
          * automatically handle clicks on the Home/Up button, so long
          * as you specify a parent activity in AndroidManifest.xml. */
         val id = item.itemId
-
 
         return if (id == R.id.action_settings) {
             true
