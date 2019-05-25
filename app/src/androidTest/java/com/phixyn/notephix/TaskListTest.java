@@ -1,19 +1,16 @@
 package com.phixyn.notephix;
 
 import android.content.pm.ActivityInfo;
-import android.support.test.filters.LargeTest;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
-
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.LargeTest;
+import androidx.test.rule.ActivityTestRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import java.util.Arrays;
 import java.util.List;
-
 import static com.schibsted.spain.barista.assertion.BaristaFocusedAssertions.assertFocused;
 import static com.schibsted.spain.barista.assertion.BaristaFocusedAssertions.assertNotFocused;
 import static com.schibsted.spain.barista.assertion.BaristaHintAssertions.assertHint;
