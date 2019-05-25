@@ -56,7 +56,6 @@ class TaskRecyclerAdapter(private val mContext: Context, private val mTasks: Arr
         val task = mTasks[position]
         // ...and display it in the view holder's TextView.
         holder.mTaskTextView.text = task
-        notifyDataSetChanged()
     }
 
     /**
