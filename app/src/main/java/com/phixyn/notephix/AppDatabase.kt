@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 
 /** Abstract class representing the app's database. */
 @Database(entities = [Note::class], version = 1)
+@TypeConverters(DateTypeConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     // Declare an abstract function for each DAO, which returns the DAO.
     abstract fun noteDao(): NoteDao
