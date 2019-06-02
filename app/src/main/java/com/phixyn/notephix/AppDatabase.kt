@@ -27,10 +27,11 @@ abstract class AppDatabase : RoomDatabase() {
                 synchronized(AppDatabase::class) {
                     // Build Room database
                     INSTANCE = Room.databaseBuilder(
-                            context.applicationContext,
-                            AppDatabase::class.java,
-                            "appDB"
-                    ).build()
+                        context.applicationContext,
+                        AppDatabase::class.java,
+                        "notephix-db"
+                    ).allowMainThreadQueries().build()
+                    // FIXME: Improve this so we don't use DB on main thread
                 }
             }
             return INSTANCE
