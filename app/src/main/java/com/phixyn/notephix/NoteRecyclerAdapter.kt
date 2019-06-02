@@ -7,10 +7,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import java.util.ArrayList
 
-class TaskRecyclerAdapter(private val mContext: Context, private val mTasks: ArrayList<String>) :
-    RecyclerView.Adapter<TaskRecyclerAdapter.ViewHolder>() {
+class NoteRecyclerAdapter(private val mContext: Context, private val notes: List<Note>) :
+    RecyclerView.Adapter<NoteRecyclerAdapter.ViewHolder>() {
 
     // LayoutInflater is used to create views from a layout resource
     // It "inflates" layout resources into view hierarchies
@@ -52,10 +51,10 @@ class TaskRecyclerAdapter(private val mContext: Context, private val mTasks: Arr
      * @param position The position of the data item we need to display.
      */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        // Get the data from our ArrayList...
-        val task = mTasks[position]
+        // Get the data from our database...
+        val note = notes[position]
         // ...and display it in the view holder's TextView.
-        holder.mTaskTextView.text = task
+        holder.mTaskTextView.text = note.body
     }
 
     /**
@@ -63,7 +62,7 @@ class TaskRecyclerAdapter(private val mContext: Context, private val mTasks: Arr
      *
      * @return Number of items in our ArrayList.
      */
-    override fun getItemCount(): Int = mTasks.size
+    override fun getItemCount(): Int = notes.size
 
     /**
      * ViewHolder class for our RecyclerView. Receives a View.
@@ -71,6 +70,9 @@ class TaskRecyclerAdapter(private val mContext: Context, private val mTasks: Arr
      */
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val mTaskTextView: TextView = itemView.findViewById(R.id.view_task_card_text)
+        private var appDatabase: AppDatabase? = AppDatabase
+            .getAppDatabase(context = itemView.context)
+        private var noteDao: NoteDao? = appDatabase?.noteDao()
 
         init {
             // Set a click listener for the whole CardView
@@ -82,10 +84,11 @@ class TaskRecyclerAdapter(private val mContext: Context, private val mTasks: Arr
              * @param view The instance of the CardView that was tapped on.
              */
             itemView.setOnClickListener {
-                mTasks.removeAt(adapterPosition)
+                noteDao?.deleteNote(notes[adapterPosition])
+                // noteDao?.removeAt(adapterPosition)
                 notifyDataSetChanged()
                 // Write updated data set to file
-                FileHelper.writeData(mTasks, mContext)
+                // FileHelper.writeData(mTasks, mContext)
 
                 Toast.makeText(
                     mContext,
