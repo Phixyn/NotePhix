@@ -9,7 +9,7 @@ import java.util.Date
 @Entity
 data class Note(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Int? = null,
     val title: String = "",
     val body: String,
     @ColumnInfo(name = "created_on")
