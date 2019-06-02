@@ -15,12 +15,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import java.util.ArrayList
+import java.util.Date
 
 class MainActivity : AppCompatActivity() {
-    private var mNewTaskEditText: EditText? = null
-    private var mTasksArrayList: ArrayList<String>? = null
-    private var mTasksRecyclerAdapter: TaskRecyclerAdapter? = null
+    private var appDatabase: AppDatabase? = null
+    private var noteDao: NoteDao? = null
+
+    private var newNoteEditText: EditText? = null
+    private var notesList: List<Note>? = null
+    private var notesRecyclerAdapter: NoteRecyclerAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,26 +33,29 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+        appDatabase = AppDatabase.getAppDatabase(context = this)
+        noteDao = appDatabase?.noteDao()
+
         // Get references of the EditText and Add button
-        mNewTaskEditText = findViewById(R.id.item_edit_text)
+        newNoteEditText = findViewById(R.id.item_edit_text)
         val addTaskButton = findViewById<Button>(R.id.add_btn)
 
         // Set up EditText for typing a new task
         // Set up an event listener for when the focus on EditText changes
-        mNewTaskEditText!!.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+        newNoteEditText!!.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             // Hide soft keyboard if EditText loses focus
             if (!hasFocus) {
                 val imm = getSystemService(
                     Context.INPUT_METHOD_SERVICE
                 ) as InputMethodManager
                 imm.hideSoftInputFromWindow(
-                    mNewTaskEditText!!.windowToken,
+                    newNoteEditText!!.windowToken,
                     0
                 )
             }
         }
         // Set up an event listener for editor actions
-        mNewTaskEditText!!.setOnEditorActionListener(
+        newNoteEditText!!.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     // When IME_ACTION_DONE event is triggered, send a
@@ -65,25 +71,33 @@ class MainActivity : AppCompatActivity() {
         // Set up "Add task" button
         // Register an event listener for onClick to the Button
         addTaskButton.setOnClickListener {
-            val taskEntered = mNewTaskEditText!!.text.toString()
+            val taskEntered = newNoteEditText!!.text.toString()
             // Ensure that the string entered is not empty or all spaces
             if (taskEntered.isNotEmpty() && taskEntered.trim { it <= ' ' }.isNotEmpty()) {
                 // TODO: Not sure if this is the best way to do things
                 // Should we add via the adapter directly, like we did previously
                 // with the ArrayAdapter? Or is this fine?
                 // tasksAdapter.add(taskEntered);
+                val dateNow = Date()
+                val newNote = Note(
+                    body = taskEntered,
+                    createdOn = dateNow,
+                    updatedOn = dateNow
+                )
 
                 /* Add new task to the beginning of the ArrayList
-                 * Unlike mTasksArrayList.add(taskEntered); this will ensure that
+                 * Unlike notesList.add(taskEntered); this will ensure that
                  * new tasks appear at the top of the RecyclerView, rather than
                  * being added at the bottom. */
-                mTasksArrayList!!.add(0, taskEntered)
-                mTasksRecyclerAdapter!!.notifyDataSetChanged()
+                // Write note to database
+                noteDao?.insertNote(newNote)
+                // notesList!!.add(0, taskEntered)
+                notesRecyclerAdapter!!.notifyDataSetChanged()
                 // Write task to file
-                FileHelper.writeData(mTasksArrayList!!, this@MainActivity)
+                // FileHelper.writeData(notesList!!, this@MainActivity)
 
-                mNewTaskEditText!!.setText("")
-                mNewTaskEditText!!.clearFocus()
+                newNoteEditText!!.setText("")
+                newNoteEditText!!.clearFocus()
                 Toast.makeText(
                     this@MainActivity,
                     "Task added",
@@ -103,20 +117,23 @@ class MainActivity : AppCompatActivity() {
          *   StaggeredGridLayoutManager */
 
         // Read tasks from the file and pass them to our Recycler Adapter
-        mTasksArrayList = FileHelper.readData(this)
-        mTasksRecyclerAdapter = TaskRecyclerAdapter(this, mTasksArrayList!!)
+        // notesList = FileHelper.readData(this)
+
+        // Read notes from the Room database and pass them to our Recycler Adapter
+        notesList = noteDao?.getAll()
+        notesRecyclerAdapter = NoteRecyclerAdapter(this, notesList!!)
         // Finally, set the RecyclerView's adapter to our adapter
-        tasksListView.adapter = mTasksRecyclerAdapter
+        tasksListView.adapter = notesRecyclerAdapter
     }
 
     override fun onResume() {
         super.onResume()
         // Make sure the EditText does not receive focus when activity is resumed
-        mNewTaskEditText!!.clearFocus()
+        newNoteEditText!!.clearFocus()
         /* Note: If the data set is large, it is worth looking into the finer control
          * methods available in RecyclerAdapter, which allow notifying if individual
          * items have been added, removed, or changed. */
-        mTasksRecyclerAdapter!!.notifyDataSetChanged()
+        notesRecyclerAdapter!!.notifyDataSetChanged()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
