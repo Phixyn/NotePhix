@@ -13,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.util.Date
@@ -22,7 +23,8 @@ class MainActivity : AppCompatActivity() {
     private var noteDao: NoteDao? = null
 
     private var newNoteEditText: EditText? = null
-    private var notesList: List<Note>? = null
+//    private var notesList: List<Note>? = null
+    private var notesList: LiveData<List<Note>>? = null
     private var notesRecyclerAdapter: NoteRecyclerAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

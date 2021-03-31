@@ -6,9 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 
-class NoteRecyclerAdapter(private val mContext: Context, private val notes: List<Note>) :
+class NoteRecyclerAdapter(private val mContext: Context, private val notes: LiveData<List<Note>>) :
     RecyclerView.Adapter<NoteRecyclerAdapter.ViewHolder>() {
 
     // LayoutInflater is used to create views from a layout resource
@@ -52,7 +53,7 @@ class NoteRecyclerAdapter(private val mContext: Context, private val notes: List
      */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         // Get the data from our database...
-        val note = notes[position]
+        val note = notes?.value[position]
         // ...and display it in the view holder's TextView.
         holder.mTaskTextView.text = note.body
     }
@@ -62,7 +63,7 @@ class NoteRecyclerAdapter(private val mContext: Context, private val notes: List
      *
      * @return Number of items in our ArrayList.
      */
-    override fun getItemCount(): Int = notes.size
+    override fun getItemCount(): Int = notes.value?.size!!
 
     /**
      * ViewHolder class for our RecyclerView. Receives a View.
