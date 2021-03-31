@@ -1,9 +1,10 @@
 # NotePhix
 
-**Author:** Alpeche Pancha
-
 Android GTD and note-taking app.
 
 ![NotePhix App Screenshot](screenshots/readme_screenshot.png?raw=true)
 
-Follow the project's sprint planning on [Taiga.](https://tree.taiga.io/project/phixyn-notephix/)
+- - -
+
+This project is no longer in development. The repository is now archived and in read-only mode.
+
